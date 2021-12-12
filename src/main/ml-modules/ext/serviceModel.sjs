@@ -1054,6 +1054,7 @@ function getGeoServerLayerSchema(layerName) {
   return layer;
 }
 
+exports.MAX_RECORD_COUNT = MAX_RECORD_COUNT;
 exports.getServiceModels = module.amp(getServiceModels);
 exports.getServiceModel = module.amp(getServiceModel);
 exports.getLayerModel = module.amp(getLayerModel);
