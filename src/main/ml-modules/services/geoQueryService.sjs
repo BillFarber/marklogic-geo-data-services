@@ -13,9 +13,6 @@ const geoextractor = require('/ext/geo/extractor.sjs');
 const qd = require('/ext/query/ctsQueryDeserialize.sjs').qd;
 const gsu = require('/ext/search/geo-search-util.xqy');
 
-const MAX_RECORD_COUNT = 5000;
-const defaultDocId = "DocId" + xdmp.request();
-
 const joinFunctionMap = {
   "inner":"joinInner",
   "left outer":"joinLeftOuter",
@@ -137,7 +134,7 @@ function query(req, exportPlan=false) {
     type : 'FeatureCollection',
     metadata : {
       name: req.params.id,
-      maxRecordCount: MAX_RECORD_COUNT
+      maxRecordCount: sm.MAX_RECORD_COUNT
     },
     filtersApplied: {
       geometry: true, // true if a geometric filter has already been applied to the data
@@ -639,12 +636,23 @@ function getTimeBoundingWhereQuery(layerModel, req) {
   }
 }
 
+/**
+ * Create a unique column name for the doc id join
+ * @param serviceName 
+ * @returns 
+ */
+function getDefaultDocIdColumn(serviceName) {
+  return "docId_" + serviceName + "_";
+}
+
 // returns a Sequence of documents
 function getObjects(req, exportPlan=false) {
 
   xdmp.trace("GDS-DEBUG", "Starting getObjects");
   xdmp.trace("GDS-DEBUG", "getLayerModel(" + req.params.id + ", " + req.params.layer + ")" );
   const layerModel = sm.getLayerModel(req.params.id, req.params.layer);
+
+  const defaultDocId = getDefaultDocIdColumn(req.params.id);
 
   const query = req.query;
   const orderByFields = parseOrderByFields(query);
@@ -726,7 +734,7 @@ function getObjects(req, exportPlan=false) {
   }
   else {
     xdmp.trace("GDS-DEBUG", "Setting to limit to MAX_RECORD_COUNT");
-    limit = MAX_RECORD_COUNT
+    limit = sm.MAX_RECORD_COUNT
   }
 
   xdmp.trace("GDS-DEBUG", "limit: " + limit);
@@ -982,6 +990,8 @@ function aggregate(req) {
 
   // this will be the koop provider "id"
   const layerModel = sm.getLayerModel(req.params.id, req.params.layer);
+
+  const defaultDocId = getDefaultDocIdColumn(req.params.id);
 
   const query = req.query;
   const stats = parseOutStatistics(query)
@@ -1277,3 +1287,4 @@ function getAggregateStatDef(stat) {
 }
 
 exports.POST = post;
+exports.getData = getData;
