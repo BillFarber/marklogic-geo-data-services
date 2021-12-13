@@ -13,6 +13,8 @@ const geoextractor = require('/ext/geo/extractor.sjs');
 const qd = require('/ext/query/ctsQueryDeserialize.sjs').qd;
 const gsu = require('/ext/search/geo-search-util.xqy');
 
+const MAX_RECORD_COUNT = 5000;
+
 const joinFunctionMap = {
   "inner":"joinInner",
   "left outer":"joinLeftOuter",
@@ -134,7 +136,7 @@ function query(req, exportPlan=false) {
     type : 'FeatureCollection',
     metadata : {
       name: req.params.id,
-      maxRecordCount: sm.MAX_RECORD_COUNT
+      maxRecordCount: MAX_RECORD_COUNT
     },
     filtersApplied: {
       geometry: true, // true if a geometric filter has already been applied to the data
@@ -734,7 +736,7 @@ function getObjects(req, exportPlan=false) {
   }
   else {
     xdmp.trace("GDS-DEBUG", "Setting to limit to MAX_RECORD_COUNT");
-    limit = sm.MAX_RECORD_COUNT
+    limit = MAX_RECORD_COUNT
   }
 
   xdmp.trace("GDS-DEBUG", "limit: " + limit);
